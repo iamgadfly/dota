@@ -23,7 +23,7 @@
                 <meta itemprop="position" content="2">
             </span>
         </div>
-        <h1>Buy skins</h1>
+        <h1 style="margin-top:30px">Buy skins</h1>
     </div>
 
     <div class="wrap">
