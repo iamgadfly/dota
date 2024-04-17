@@ -256,29 +256,32 @@ class TradeController extends Controller
         $o->items      = json_encode($request->items);
         //        $o->save();
 
-        $data = urlencode(
-            json_encode([
-                'deposit_id' => 1,
-                'game'       => TradeEnum::GAME,
-                'items'      => $request->get('items'),
-            ])
-        );
+        //        $data = urlencode(
+        //            json_encode([
+        //                'deposit_id' => 1,
+        //                'game'       => TradeEnum::GAME,
+        //                'items'      => $request->get('items'),
+        //            ])
+        //        );
+        //
+        //        $resp = Http::withHeaders([
+        //            'Token'        => TradeEnum::TOKEN,
+        //            'Content-Type' => 'application/x-www-form-urlencoded'
+        //            //                'application/json',
+        //        ])->withBody(
+        //            urlencode(
+        //                json_encode([
+        //                    'deposit_id' => 1,
+        //                    'game'       => TradeEnum::GAME,
+        //                    'items'      => $request->get('items'),
+        //                ])
+        //            )
+        //        )
+        //            ->post(TradeEnum::TRADE);
 
-        $resp = Http::withHeaders([
-            'Token'        => TradeEnum::TOKEN,
-            'Content-Type' => 'application/x-www-form-urlencoded'
-            //                'application/json',
-        ])->withBody(
-            urlencode(
-                json_encode([
-                    'deposit_id' => 1,
-                    'game'       => TradeEnum::GAME,
-                    'items'      => $request->get('items'),
-                ])
-            )
-        )
-            ->post(TradeEnum::TRADE);
-
+        //        dd("transaction_id=". "123"
+        //            ."&game="
+        //            .TradeEnum::GAME."&items=" . "783312163");
 
         $curl = curl_init();
         curl_setopt_array($curl, [
@@ -289,7 +292,7 @@ class TradeController extends Controller
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
-            CURLOPT_POSTFIELDS     => "deposit_id=4&steam_id=76561198841334052",
+            CURLOPT_POSTFIELDS     => "deposit_id=12&steam_id=76561198841334052",
             CURLOPT_HTTPHEADER     => [
                 "Token:".TradeEnum::TOKEN,
                 "cache-control: no-cache",
@@ -300,12 +303,14 @@ class TradeController extends Controller
         //        "&game=".TradeEnum::GAME."&items=".implode(', ', $request->get('items')
         $resp = curl_exec($curl);
         $resp = json_decode($resp);
+        //        dd($resp);
         if ($resp->status == 'error') {
             return response()->json([
                 'status' => false,
                 'error'  => $resp->error_message,
             ]);
         }
+//                dd($resp);
 
         //        $resp = ;
         //        12430999
@@ -320,13 +325,13 @@ class TradeController extends Controller
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
-//            $resp->transaction_id
-            CURLOPT_POSTFIELDS     => "transaction_id=". 1
-                ."&game="
-                .TradeEnum::GAME."&items=".implode(
-                    ', ',
-                    $request->get('items')
-                ),
+            //            $resp->transaction_id
+            CURLOPT_POSTFIELDS     => "transaction_id=".$resp->transaction_id
+                ."&game=".TradeEnum::GAME."&items="."[783312163]",
+            //                .implode(
+            //                    ', ',
+            //                    $request->get('items')
+            //                ),
             CURLOPT_HTTPHEADER     => [
                 "Token:".TradeEnum::TOKEN,
                 "cache-control: no-cache",
@@ -342,7 +347,8 @@ class TradeController extends Controller
         //            'items'      => $request->get('items'),
         //        ]));
 
-        dd($resp->json());
+//        dd($resp->json());
+        return $resp->json();
         //        dd($request->all());
     }
 

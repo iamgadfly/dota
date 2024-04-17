@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Items;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -9,7 +10,7 @@ class PageController extends Controller
 {
     public function market(Request $request)
     {
-        return view('content', ['market', 'test' => true]);
+        return view('content', ['market', 'test' => true, 'items' => Items::paginate(60)]);
     }
 
     public function contacts(Request $request)
@@ -85,5 +86,14 @@ class PageController extends Controller
     public function referrals(Request $request)
     {
         return view('content', ['referrals']);
+    }
+
+    public function item($slug)
+    {
+        $item = Items::where('slug', $slug)->first();
+        if (is_null($item)){
+            return redirect('/404');
+        }
+        return view('content', ['item', 'item_data' => $item]);
     }
 }

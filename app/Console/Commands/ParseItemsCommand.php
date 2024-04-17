@@ -6,6 +6,7 @@ use App\Enums\TradeEnum;
 use App\Models\Items;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class ParseItemsCommand extends Command
 {
@@ -45,6 +46,7 @@ class ParseItemsCommand extends Command
                 ['classid' => $item['properties']['classid']],
                 [
                     'name'      => $item['name'],
+                    'slug' => Str::slug($item['name']),
                     'price_usd' => $item['price'],
                     'count'     => $item['count'],
                     'classid'   => $item['properties']['classid'],

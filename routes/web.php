@@ -22,6 +22,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('profile', 'profile');
     Route::get('security', 'security');
     Route::get('referrals', 'referrals');
+    Route::get('market/item/{slug}', 'item');
 });
 
 Route::post('/trade', [TradeController::class, 'trade']);

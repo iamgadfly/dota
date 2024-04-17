@@ -12,9 +12,11 @@ class Items extends Model
     public $fillable = [
         'id',
         'name',
+        'slug',
         'price_usd',
         'price_rub',
         'count',
         'classid',
+        'image',
     ];
 }
