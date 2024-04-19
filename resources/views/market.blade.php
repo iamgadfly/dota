@@ -2351,11 +2351,11 @@
                                     <div class="info-item">0.040087</div>
                                 </div>
                                 {{--                            https://lis-skins.ru/market_images/98943_s.png--}}
-                                <img src="" class="image"
+                                <img src="{{ str_replace('"', '', $item->image) }}" class="image"
                                      alt="{{$item->name }}"
                                      title="{{ $item->name }}">
                                 {{--                            https://lis-skins.ru/market/csgo/%E2%98%85-m9-bayonet-gamma-doppler-emerald-factory-new/--}}
-                                <a href="item/{{$item->slug}}"
+                                <a href="/market/item/{{$item->slug}}"
                                    class="name">
                                     <div class="name-inner">{{$item->name}}</div>
                                     {{--                                <div class="name-exterior">(Factory New)</div>--}}

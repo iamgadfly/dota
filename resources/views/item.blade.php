@@ -60,7 +60,7 @@
         <div class="skins-market-view" itemscope="" itemtype="http://schema.org/Product">
 
             <div itemprop="image" itemscope="" itemtype="https://schema.org/ImageObject">
-                <meta itemprop="url contentUrl" content="https://lis-skins.ru/market_images/20234_b.png">
+                <meta itemprop="url contentUrl" content="{{ str_replace('"', '', $data['item_data']->image) }}">
             </div>
 
             <div class="market-skin-preview">
@@ -70,9 +70,9 @@
                         <span>2 дня до разблокировки</span>
                     </div>
 
-                    <a href="https://lis-skins.ru/market_images/20234_b.png" data-lightbox="group"
+                    <a href="{{ str_replace('"', '', $data['item_data']->image) }}" data-lightbox="group"
                        title="Dark Artistry Cape">
-                        <img src="https://lis-skins.ru/market_images/20234_b.png" class="image" alt="Dark Artistry Cape"
+                        <img src="{{ str_replace('"', '', $data['item_data']->image) }}" class="image" alt="Dark Artistry Cape"
                              title="Dark Artistry Cape" itemprop="image">
                     </a>
 

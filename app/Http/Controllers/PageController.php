@@ -10,7 +10,7 @@ class PageController extends Controller
 {
     public function market(Request $request)
     {
-        return view('content', ['market', 'test' => true, 'items' => Items::paginate(60)]);
+        return view('content', ['market', 'test' => true, 'items' => Items::whereNotNull('image')->paginate(60)]);
     }
 
     public function contacts(Request $request)
