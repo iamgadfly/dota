@@ -10,6 +10,7 @@
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.12",
         "laravel/tinker": "^2.9",
+        "livewire/livewire": "^3.0",
         "socialiteproviders/steam": "^4.2",
         "socialiteproviders/vkontakte": "^5.0",
         "waylaidwanderer/php-steamcommunity": "dev-master"

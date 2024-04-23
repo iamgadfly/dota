@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CartHelper;
 use App\Models\Items;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -10,82 +11,27 @@ class PageController extends Controller
 {
     public function market(Request $request)
     {
-        return view('content', ['market', 'test' => true, 'items' => Items::whereNotNull('image')->paginate(60)]);
+        return view('layouts.app', ['market', 'test' => true, 'items' => Items::inRandomOrder()->whereNotNull('image')->paginate(60)]);
     }
 
     public function contacts(Request $request)
     {
-        return view('content', ['contacts']);
+        return view('layouts.app', ['contacts']);
     }
 
     public function faq(Request $request)
     {
-        return view('content', ['faq']);
+        return view('layouts.app', ['faq']);
     }
 
     public function works(Request $request)
     {
-        return view('content', ['works']);
-    }
-
-    public function mnogo(Request $request)
-    {
-        return view('content', ['mnogo']);
-    }
-
-    public function guarantees(Request $request)
-    {
-        return view('content', ['guarantees']);
-    }
-
-    public function blog(Request $request)
-    {
-        return view('content', ['blog']);
-    }
-
-    public function sell(Request $request)
-    {
-        return view('content', ['sell']);
-    }
-
-    public function reviews(Request $request)
-    {
-        return view('content', ['reviews']);
+        return view('layouts.app', ['works']);
     }
 
     public function rules(Request $request)
     {
-        return view('content', ['rules']);
-    }
-
-    public function oferta(Request $request)
-    {
-        return view('content', ['oferta']);
-    }
-
-    public function privacy_policy(Request $request)
-    {
-        return view('content', ['privacy_policy']);
-    }
-
-    public function inventory(Request $request)
-    {
-        return view('content', ['inventory']);
-    }
-
-    public function profile(Request $request)
-    {
-        return view('content', ['profile']);
-    }
-
-    public function security(Request $request)
-    {
-        return view('content', ['security']);
-    }
-
-    public function referrals(Request $request)
-    {
-        return view('content', ['referrals']);
+        return view('layouts.app', ['rules']);
     }
 
     public function item($slug)
@@ -94,6 +40,26 @@ class PageController extends Controller
         if (is_null($item)){
             return redirect('/404');
         }
-        return view('content', ['item', 'item_data' => $item]);
+        return view('item', ['item', 'item_data' => $item]);
+    }
+
+    public function remove(Request $request, CartHelper $helper)
+    {
+        $helper->remove($request->get('classid'));
+    }
+
+    public function remove_all(Request $request, CartHelper $helper)
+    {
+        $helper->clear();
+    }
+
+    public function add(Request $request, CartHelper $helper)
+    {
+        $helper->add($request->get('classid'));
+    }
+
+    public function get_items(CartHelper $helper)
+    {
+        return response()->json(\App\Models\Items::whereIn('classid', $helper->get()['items'])->get(), 200);
     }
 }

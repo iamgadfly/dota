@@ -1,3 +1,7 @@
+.none {
+    display: none;
+}
+/**/
 body.lb-disable-scrolling {
     overflow: hidden
 }
@@ -823,10 +827,6 @@ body.lb-disable-scrolling {
 
 .fa-retweet:before {
     content: "\f079"
-}
-
-.fa-shopping-cart:before {
-    content: "\f07a"
 }
 
 .fa-folder:before {
@@ -2315,10 +2315,6 @@ body.lb-disable-scrolling {
 
 .fa-skyatlas:before {
     content: "\f216"
-}
-
-.fa-cart-plus:before {
-    content: "\f217"
 }
 
 .fa-cart-arrow-down:before {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ErrEnum;
 use App\Enums\OrderEnum;
 use App\Enums\TradeEnum;
 use App\Http\Requests\CreateTradeRequest;
@@ -243,18 +244,14 @@ class TradeController extends Controller
         return $resp;
     }
 
-    public function create_trade(\Illuminate\Http\Request $request)
+    public function create_deposit(\Illuminate\Http\Request $request)
     {
-        //        dd($request->all());
-        //        $items = Items::pluck('price_usd');
-
         $o             = new Order();
         $o->user_id    = 1;
         $o->status     = OrderEnum::CREATED;
         $o->usd_amount = 0;
         $o->rub_amount = 0;
         $o->items      = json_encode($request->items);
-        //        $o->save();
 
         //        $data = urlencode(
         //            json_encode([
@@ -283,6 +280,8 @@ class TradeController extends Controller
         //            ."&game="
         //            .TradeEnum::GAME."&items=" . "783312163");
 
+
+        $o->save();
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL            => TradeEnum::DEPOSIT,
@@ -292,7 +291,8 @@ class TradeController extends Controller
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
-            CURLOPT_POSTFIELDS     => "deposit_id=12&steam_id=76561198841334052",
+            CURLOPT_POSTFIELDS     => "deposit_id=".$o->id
+                ."&steam_id=76561198841334052",
             CURLOPT_HTTPHEADER     => [
                 "Token:".TradeEnum::TOKEN,
                 "cache-control: no-cache",
@@ -303,17 +303,47 @@ class TradeController extends Controller
         //        "&game=".TradeEnum::GAME."&items=".implode(', ', $request->get('items')
         $resp = curl_exec($curl);
         $resp = json_decode($resp);
-        //        dd($resp);
+        $o->save();
+
         if ($resp->status == 'error') {
+            $o->status = OrderEnum::ERROR;
+            $o->save();
+
             return response()->json([
                 'status' => false,
-                'error'  => $resp->error_message,
+                'err'    => $resp->error_message,
             ]);
         }
-//                dd($resp);
+
+        $o->url            = $resp->url;
+        $o->status         = OrderEnum::PROCESSING;
+        $o->transaction_id = intval($resp->transaction_id);
+        $o->save();
+
+        return response()->json([
+            'status' => true,
+            'data'   => $resp,
+        ]);
+
+        //                dd($resp);
 
         //        $resp = ;
         //        12430999
+
+
+        //        dd($request->all());
+    }
+
+    public function create_trade(\Illuminate\Http\Request $request)
+    {
+        $order = Order::find($request->get('order_id'));
+
+        if (empty($order)) {
+            return response()->json(
+                ['status' => false, 'err' => ErrEnum::ORDER_NOT_FOUND],
+                400
+            );
+        }
 
 
         $curl = curl_init();
@@ -326,12 +356,11 @@ class TradeController extends Controller
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
             //            $resp->transaction_id
-            CURLOPT_POSTFIELDS     => "transaction_id=".$resp->transaction_id
-                ."&game=".TradeEnum::GAME."&items="."[783312163]",
-            //                .implode(
-            //                    ', ',
-            //                    $request->get('items')
-            //                ),
+            CURLOPT_POSTFIELDS     => "transaction_id=".$order->transaction_id
+                ."&game=".TradeEnum::GAME."&items=".implode(
+                    ', ',
+                    $request->get('items')
+                ),
             CURLOPT_HTTPHEADER     => [
                 "Token:".TradeEnum::TOKEN,
                 "cache-control: no-cache",
@@ -347,9 +376,8 @@ class TradeController extends Controller
         //            'items'      => $request->get('items'),
         //        ]));
 
-//        dd($resp->json());
+        //        dd($resp->json());
         return $resp->json();
-        //        dd($request->all());
     }
 
 }

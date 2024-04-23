@@ -6,6 +6,15 @@
 
 <title>Laravel</title>
 
+@php
+    $h = new \App\Helpers\CartHelper();
+    if (!empty($h->get()['items'])){
+        $cart_items = \App\Models\Items::whereIn('classid', $h->get()['items'])->get();
+    } else {
+        $cart_items = [];
+    }
+@endphp
+
 <body>
 <header class="header">
     <section class="max-container wrap">
@@ -53,6 +62,148 @@
             </div>
         </nav>
 
+        <div class="skins-market-user-cart none">
+            <div class="cart-title">Корзина</div>
+            <div class="cart-close" id="market-cart-close"></div>
+            <div class="cart-content">
+                <div class="cart-empty hidden">
+                    <div class="cart-empty-wrapper">
+                        <div class="cart-empty-title">Корзина пуста</div>
+                        <img src="https://lis-skins.ru/assets/images/smile.svg" alt="Cart empty logo"
+                             class="cart-empty-logo">
+                    </div>
+                    <div class="cart-empty-desc">Добавьте предметы из нашего инвентаря</div>
+                </div>
+                <div class="cart-items-content">
+                    <div class="cart-note">Вывод заблокированных (Trade Lock) скинов будет доступен после их
+                        разблокировки. Необходимо вручную вывести скины с Личного кабинета в течении 12 часов, иначе
+                        сделка отменится и деньги вернутся вам на баланс. Дату и время разблокировки можно отследить
+                        в
+                        личном кабинете.
+                    </div>
+
+                    <div class="cart-headers">
+                        <p class="cart-headers-item">
+                            Предмет </p>
+
+                        <p class="cart-headers-price">
+                            Стоимость </p>
+
+                    </div>
+
+                    <div class="cart-grid">
+                        <div class="cart-items-scrollable">
+                            <div class="cart-items market-cart-items">
+
+                                @if (!empty($cart_items))
+                                    @foreach ($cart_items as $item)
+                                        <div class="small-item" id="item-{{ $item->id }}" data-id="{{ $item->id }}">
+                                            <div class="item-image"
+                                                 style="background-image:url({{ $item->image }});"
+                                                 alt="{{ $item->name }}" title="{{ $item->name }}">
+                                            </div>
+                                            <div class="item-info">
+                                                <div class="skin-name">{{ $item->name }}</div>
+
+
+                                                <div class="unhold-date">
+                                                    5 часов до разблокировки
+                                                </div>
+
+                                                <div class="item-price item-price_mobile">
+                                                        <span class="item-price-value">
+                                                            2 984.81 <svg xmlns="http://www.w3.org/2000/svg"
+                                                                          viewBox="0 0 255.15 300">
+                                                                <defs>
+                                                                    <style>
+                                                                        .cls-1 {
+                                                                            fill: #a73006;
+                                                                        }
+                                                                    </style>
+                                                                </defs>
+                                                                <path
+                                                                    d="M165.58 177.2c68.93-.13 89.62-39.82 89.62-94.7C255.16 36.94 227.34 0 165.58 0h-120v209.46H0v46.28h45.58V300h50.35v-44.26h42.77v-46.28H95.9V177.2h69.68zM95.88 47.3l67.36-.5c20.35 0 37.5 12.22 37.5 41.8 0 32.5-15.1 41.3-34.18 41.3H95.9V47.3z"
+                                                                    class="cls-1"></path>
+                                                            </svg>
+
+                                                        </span>
+                                                    <span class="item-price-disabled">Недоступен для покупки</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="item-price">
+                                                    <span class="item-price-value">
+                                                        {{ $item->price_usd }} <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    viewBox="0 0 255.15 300">
+                                                            <defs>
+                                                                <style>
+                                                                    .cls-1 {
+                                                                        fill: #a73006;
+                                                                    }
+                                                                </style>
+                                                            </defs>
+                                                            <path
+                                                                d="M165.58 177.2c68.93-.13 89.62-39.82 89.62-94.7C255.16 36.94 227.34 0 165.58 0h-120v209.46H0v46.28h45.58V300h50.35v-44.26h42.77v-46.28H95.9V177.2h69.68zM95.88 47.3l67.36-.5c20.35 0 37.5 12.22 37.5 41.8 0 32.5-15.1 41.3-34.18 41.3H95.9V47.3z"
+                                                                class="cls-1"></path>
+                                                        </svg>
+
+                                                    </span>
+                                                <span class="item-price-disabled">Недоступен для покупки</span>
+                                            </div>
+                                            {{--wire:click="{{$h->remove($item->classid)}}"--}}
+{{--                                            {{$h->remove($item->classid)}}--}}
+                                            <div class="item-remove" onclick="removeItem({{$item}})"></div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                @endif
+
+                            </div>
+                        </div>
+                        <div class="cart-info">
+                            <div class="cart-info-summary">
+                                <p class="cart-info-summary-title">Итого</p>
+
+                                <div class="cart-info-summary-list">
+                                    <div class="cart-info-summary-item">
+                                        <div class="item-title">Предметы</div>
+                                        <div class="item-value cart-info-total-count">3</div>
+                                    </div>
+                                    <div class="cart-info-summary-item summary-total">
+                                        <div class="item-title">Всего</div>
+                                        <div class="item-value"><span class="cart-info-total-sum">8 278.40</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255.15 300">
+                                                <defs>
+                                                    <style>
+                                                        .cls-1 {
+                                                            fill: #a73006;
+                                                        }
+                                                    </style>
+                                                </defs>
+                                                <path
+                                                    d="M165.58 177.2c68.93-.13 89.62-39.82 89.62-94.7C255.16 36.94 227.34 0 165.58 0h-120v209.46H0v46.28h45.58V300h50.35v-44.26h42.77v-46.28H95.9V177.2h69.68zM95.88 47.3l67.36-.5c20.35 0 37.5 12.22 37.5 41.8 0 32.5-15.1 41.3-34.18 41.3H95.9V47.3z"
+                                                    class="cls-1"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="buy-button" data-buying-text="Покупаем">Купить</div>
+                            <div class="clear-cart" onclick="remove(this)">Очистить корзину</div>
+
+                            <div class="cart-info-rules">
+                                Покупая скины, я соглашаюсь с <a href="/privacy_policy/" target="_BLANK">политикой
+                                    конфиденциальности</a> и <a href="/rules/" target="_BLANK">правилами
+                                    использования</a></div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
         <div class="wrapper">
             <div class="social">
                 <a href="https://www.tiktok.com/@lis.skins/" class="icon-tiktok" target="_blank" rel="nofollow">
@@ -70,15 +221,30 @@
                 <a href="https://t.me/lis_skins/" class="fa fa-telegram" target="_blank" rel="nofollow"></a>
             </div>
 
-            @if(is_null(auth()->user()))
+            @if (is_null(auth()->user()))
                 <div class="login">
+                    {{--                    <img src="{{ asset('/img/shopping-cart.png') }}" alt=""> --}}
+                    <button class="cart-button highlight">
+                        {{--                        <span class="cart-info-total-count">52</span> --}}
+
+                        <i class="fa fa-shopping-cart">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                 fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                                <path
+                                    d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                            </svg>
+                        </i>
+                        <span class="cart-button-text">
+                                Корзина </span>
+                    </button>
+
                     <div class="not-loggined">
                         <a href="/auth/steam" onclick="auth();return false;" class="login-button">
                             <img src="https://lis-skins.ru/assets/images/steam_logo.svg">
                             <span class="desktop-only">
-                                Войти через Steam </span>
+                                    Войти через Steam </span>
                             <span class="mobile-only">
-                                Войти </span>
+                                    Войти </span>
                         </a>
                     </div>
                 </div>
@@ -156,6 +322,7 @@
 </header>
 
 
+<script src="{{ asset('/js/cart.js') }}"></script>
 </body>
 
 </html>

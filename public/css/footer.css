@@ -825,10 +825,6 @@ body.lb-disable-scrolling {
     content: "\f079"
 }
 
-.fa-shopping-cart:before {
-    content: "\f07a"
-}
-
 .fa-folder:before {
     content: "\f07b"
 }
@@ -2315,10 +2311,6 @@ body.lb-disable-scrolling {
 
 .fa-skyatlas:before {
     content: "\f216"
-}
-
-.fa-cart-plus:before {
-    content: "\f217"
 }
 
 .fa-cart-arrow-down:before {
