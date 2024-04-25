@@ -5,10 +5,10 @@
         <div class="footer-top">
             <div class="footer-company">
                 <div class="footer-company-header">
-                    <img alt="Footer logo" src="/assets/images/logo.svg?id=672cf719502a2233a09870fd194be61d"
+                    <img style="width: 30px; height: 30px" alt="Footer logo" src="{{ asset('/img/favicon.png') }}"
                         class="footer-company-header__logo">
                     <p class="footer-company-header__name">
-                        LIS-SKINS
+                        mk-dota2
                     </p>
                 </div>
 
@@ -18,32 +18,7 @@
 
 
             <div class="footer-links">
-                <div class="footer-links__market-wrapper">
-                    <p class="footer-links__header">
-                        Маркет </p>
 
-                    <a href="https://lis-skins.ru/csgo/" class="footer-links__item footer-links__sell-csgo">
-                        Продать скины КС ГО </a>
-
-                    <a href="https://lis-skins.ru/cs2/" class="footer-links__item footer-links__sell-cs2">
-                        Продать скины CS2 </a>
-
-                    <a href="https://lis-skins.ru/prodat-veshi-stim/"
-                        class="footer-links__item footer-links__sell-steam-skins">
-                        Продать вещи Steam </a>
-
-                    <a href="https://lis-skins.ru/market/csgo/" class="footer-links__item footer-links__buy-csgo">
-                        Купить скины </a>
-
-                    <a href="https://lis-skins.ru/market/cs2/" class="footer-links__item footer-links__buy-cs2">
-                        Купить скины CS2 </a>
-
-                    <a href="https://lis-skins.ru/market/cs2/cases/" class="footer-links__item footer-links__buy-cs2">
-                        Купить кейсы CS2 </a>
-
-                    <a href="https://lis-skins.ru/market/rust/" class="footer-links__item footer-links__buy-rust">
-                        Купить скины Раст </a>
-                </div>
 
                 <div class="footer-links__help-wrapper">
                     <p class="footer-links__header">

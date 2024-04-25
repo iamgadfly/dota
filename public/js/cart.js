@@ -32,6 +32,32 @@ cartAction.addEventListener("click", (event) => {
 
 });
 
+function createTrade(items){
+    const data = JSON.stringify(items)
+    const sendData = JSON.parse(data)
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', '/create_trade', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+        } else {
+            console.error('Request failed with status', xhr.status);
+        }
+    };
+    xhr.onerror = function() {
+        console.error('Request failed');
+    };
+
+    var s = {
+        items_ids: items,
+    };
+
+
+    xhr.send(JSON.stringify(s));
+    console.log(s)
+}
+
 const items = document.querySelector('.market-cart-items')
 
 function remove(button){

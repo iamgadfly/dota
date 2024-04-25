@@ -45,7 +45,12 @@ Route::post('/steam_auth', [TradeController::class, 'steamAuth']);
 
 Route::post('/balance', [TradeController::class, 'balance']);
 Route::get('/items', [TradeController::class, 'items']);
-Route::post('/create_deposit', [TradeController::class, 'create_deposit']);
+
+// ->middleware('auth');
+Route::post('/create_trade', [TradeController::class, 'create_trade']);
+Route::post('/trade_status', [TradeController::class, 'trade_status']); // ->middleware('auth');
+Route::post('/save_trade_url', [TradeController::class, 'save_trade_url']);
+//->middleware('auth')
 
 Route::middleware('web')->controller(\App\Http\Controllers\SocialController::class)
     ->group(function () {

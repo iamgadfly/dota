@@ -111,19 +111,19 @@
 
                                     <div class="spec-item">
                                         <div class="spec-title">Герой</div>
-                                        <div class="spec-value">Invoker</div>
+                                        <div class="spec-value">{{$item->used}}</div>
                                     </div>
                                     <div class="spec-item">
                                         <div class="spec-title">Слот</div>
-                                        <div class="spec-value">Спина</div>
+                                        <div class="spec-value">{{$item->slot}}</div>
                                     </div>
-                                    <div class="spec-item">
-                                        <div class="spec-title">Тип</div>
-                                        <div class="spec-value">Украшение</div>
-                                    </div>
+{{--                                    <div class="spec-item">--}}
+{{--                                        <div class="spec-title">Тип</div>--}}
+{{--                                        <div class="spec-value">{{}}</div>--}}
+{{--                                    </div>--}}
                                     <div class="spec-item">
                                         <div class="spec-title">Раритетность</div>
-                                        <div class="spec-value">Immortal</div>
+                                        <div class="spec-value">{{$item->rarity}}</div>
                                     </div>
                                     <div class="spec-item">
                                         <div class="spec-title">Качество:</div>
@@ -173,7 +173,7 @@
                             <div class="bulk-buy-button" style="background-color: red">
                                 <i class="bulk-buy-icon"></i>
                                 <div>Купить</div>
-                                <span class="bulk-buy-button-new"></span>
+                                <span  onclick="addToCart({{$item}})" wire:click="addToStart({{ $item->classid }})" class="bulk-buy-button-new"></span>
                             </div>
                         </div>
 

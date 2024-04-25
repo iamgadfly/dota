@@ -10,7 +10,12 @@
     $h = new \App\Helpers\CartHelper();
     if (!empty($h->get()['items'])){
         $cart_items = \App\Models\Items::whereIn('classid', $h->get()['items'])->get();
+        $cart_items_ids = $cart_items->map(function ($m){
+           return $m->id;
+        });
+        $amount = $cart_items->sum('price_usd');
     } else {
+        $cart_items_ids = [];
         $cart_items = [];
     }
 @endphp
@@ -21,7 +26,7 @@
         <nav class="header-container">
             <a href="/sell">
                 <img class="header-logo" alt="Header logo"
-                     src="/assets/images/logo.svg?id=672cf719502a2233a09870fd194be61d">
+                     src="{{ asset('/img/favicon.png') }}">
             </a>
 
             <div class="header-links">
@@ -167,28 +172,28 @@
                                 <div class="cart-info-summary-list">
                                     <div class="cart-info-summary-item">
                                         <div class="item-title">Предметы</div>
-                                        <div class="item-value cart-info-total-count">3</div>
+                                        <div class="item-value cart-info-total-count">{{count($cart_items)}}</div>
                                     </div>
                                     <div class="cart-info-summary-item summary-total">
                                         <div class="item-title">Всего</div>
-                                        <div class="item-value"><span class="cart-info-total-sum">8 278.40</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255.15 300">
-                                                <defs>
-                                                    <style>
-                                                        .cls-1 {
-                                                            fill: #a73006;
-                                                        }
-                                                    </style>
-                                                </defs>
-                                                <path
-                                                    d="M165.58 177.2c68.93-.13 89.62-39.82 89.62-94.7C255.16 36.94 227.34 0 165.58 0h-120v209.46H0v46.28h45.58V300h50.35v-44.26h42.77v-46.28H95.9V177.2h69.68zM95.88 47.3l67.36-.5c20.35 0 37.5 12.22 37.5 41.8 0 32.5-15.1 41.3-34.18 41.3H95.9V47.3z"
-                                                    class="cls-1"></path>
-                                            </svg>
+                                        <div class="item-value"><span class="cart-info-total-sum">{{is_array($cart_items) ? 0 : $cart_items->sum('price_usd')}}$</span>
+{{--                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255.15 300">--}}
+{{--                                                <defs>--}}
+{{--                                                    <style>--}}
+{{--                                                        .cls-1 {--}}
+{{--                                                            fill: #a73006;--}}
+{{--                                                        }--}}
+{{--                                                    </style>--}}
+{{--                                                </defs>--}}
+{{--                                                <path--}}
+{{--                                                    d="M165.58 177.2c68.93-.13 89.62-39.82 89.62-94.7C255.16 36.94 227.34 0 165.58 0h-120v209.46H0v46.28h45.58V300h50.35v-44.26h42.77v-46.28H95.9V177.2h69.68zM95.88 47.3l67.36-.5c20.35 0 37.5 12.22 37.5 41.8 0 32.5-15.1 41.3-34.18 41.3H95.9V47.3z"--}}
+{{--                                                    class="cls-1"></path>--}}
+{{--                                            </svg>--}}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="buy-button" data-buying-text="Покупаем">Купить</div>
+                            <div class="buy-button" onclick="createTrade({{is_array($cart_items) ? '[]' : $cart_items_ids}})" data-buying-text="Покупаем">Купить</div>
                             <div class="clear-cart" onclick="remove(this)">Очистить корзину</div>
 
                             <div class="cart-info-rules">
@@ -321,6 +326,36 @@
     </section>
 </header>
 
+@if(!is_null(auth()->user()) && is_null(auth()->user()->trade_url))
+<form action="/save_trade_url" method="POST">
+    @csrf
+<div class="popup-window undefined visible" style="z-index: 105;">
+    <div class="popup-wrap">
+        <div class="popup-close"></div>
+        <div class="popup-content-wrap">
+            <div class="popup-content">
+                <div class="popup-title">Trade URL</div>
+                <div class="popup-center-message">
+                    <div class="content-title">
+                        <svg width="40" height="40" viewBox="0 0 40 40"><path fill-rule="evenodd" clip-rule="evenodd" d="M40 20c0 11.046-8.954 20-20 20S0 31.046 0 20 8.954 0 20 0s20 8.954 20 20zm-21.765-7.912a1.5 1.5 0 011.5-1.5h.53a1.5 1.5 0 011.5 1.5v9.941a1.5 1.5 0 01-1.5 1.5h-.53a1.5 1.5 0 01-1.5-1.5v-9.94zm1.5 14.97a1.5 1.5 0 00-1.5 1.5v.53a1.5 1.5 0 001.5 1.5h.53a1.5 1.5 0 001.5-1.5v-.53a1.5 1.5 0 00-1.5-1.5h-.53z"></path></svg>
+                        Вставьте Trade URL            </div>
+                    <div class="content-description">
+                        <div class="error" style="display: block;"></div>
+                        Укажите вашу ссылку обмена. Узнать ее можно <a href="http://steamcommunity.com/profiles/76561198841334052/tradeoffers/privacy#trade_offer_access_url" target="_blank">здесь</a>.
+                    </div>
+                    <div class="content-input">
+                        <input name="trade_url" type="text" placeholder="https://steamcommunity.com/tradeoffer/new/?partner=....">
+                    </div>
+                    <div class="content-button">
+                        <button type="submit" class="popup-button">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+@endif
 
 <script src="{{ asset('/js/cart.js') }}"></script>
 </body>

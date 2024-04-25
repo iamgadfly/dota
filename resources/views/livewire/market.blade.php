@@ -1294,17 +1294,9 @@
                         </svg>
                     </div>
                     <div class="games-navigation skins-navigation__games-navigation">
-                        <a href="https://lis-skins.ru/market/csgo/" data-game-identifier="csgo" data-game-id="1"
-                            class="games-navigation__link games-navigation__link_csgo ">
-                            <img src="https://lis-skins.ru/assets/images/csgo-logo.svg" alt="CS:GO game logo">
-                        </a>
-                        <a href="https://lis-skins.ru/market/dota2/" data-game-identifier="dota2" data-game-id="4"
+                        <a href="/market" data-game-identifier="dota2" data-game-id="4"
                             class="games-navigation__link games-navigation__link_dota2 games-navigation__link_active">
                             <img src="https://lis-skins.ru/assets/images/dota2-logo.svg" alt="Dota 2 game logo">
-                        </a>
-                        <a href="https://lis-skins.ru/market/rust/" data-game-identifier="rust" data-game-id="5"
-                            class="games-navigation__link games-navigation__link_rust ">
-                            <img src="https://lis-skins.ru/assets/images/rust-logo.svg" alt="Rust game logo">
                         </a>
                     </div>
 

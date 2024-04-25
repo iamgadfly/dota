@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->float('balance_debited_amount')->nullable();
-            $table->unsignedBigInteger('transaction_id')->nullable();
-            $table->integer('date')->nullable();
+        Schema::table('items', function (Blueprint $table) {
+            $table->unsignedBigInteger('shop_item_id')->unique();
         });
     }
 
@@ -23,5 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
+        //
     }
 };

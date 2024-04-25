@@ -18,5 +18,10 @@ class Items extends Model
         'count',
         'classid',
         'image',
+        'shop_item_id',
+        'rarity',
+        'slot',
+        'used',
+        'description',
     ];
 }

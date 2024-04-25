@@ -11270,14 +11270,14 @@ body.lb-disable-scrolling {
 }
 
 .header-logo {
-    height: 58px;
-    width: 66px
+    height: 30px;
+    width: 30px;
 }
 
 @media (max-width: 800px) {
     .header-logo {
-        height:38px;
-        width: 44px
+        height:30px;
+        width: 30px;
     }
 }
 
@@ -12630,7 +12630,7 @@ body.lb-disable-scrolling {
 }
 
 .skins-market-user-cart .cart-close {
-    background-image: url(../images/cross.svg);
+    background-image: url(https://lis-skins.ru/assets/images/cross.svg);
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: 15px 15px;
@@ -17117,7 +17117,7 @@ i.fas {
 }
 
 .popup-window .popup-wrap>.popup-close {
-    background-image: url(../images/cross.svg);
+    background-image: url(https://lis-skins.ru/assets/images/cross.svg);
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: 15px 15px;
@@ -17287,6 +17287,7 @@ i.fas {
 }
 
 .popup-content .popup-button {
+    border: 0px;
     background: #e8732e;
     border-radius: 3px;
     color: #fff;
@@ -18864,7 +18865,7 @@ body .ui-tooltip {
 }
 
 .bonus-banner-close {
-    background-image: url(../images/cross.svg);
+    background-image: url(https://lis-skins.ru/assets/images/cross.svg);
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: 15px 15px;

@@ -8,7 +8,10 @@ use App\Enums\TradeEnum;
 use App\Http\Requests\CreateTradeRequest;
 use App\Models\Items;
 use App\Models\Order;
+use App\Models\User;
 use http\Env\Request;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use waylaidwanderer\SteamCommunity\TradeOffers\Trade;
 
@@ -239,113 +242,53 @@ class TradeController extends Controller
         $resp = Http::withHeaders([
             'Token'        => TradeEnum::TOKEN,
             'Content-Type' => 'application/json',
-        ])->get(TradeEnum::ITEMS.'game='.TradeEnum::GAME);
+        ])->get(TradeEnum::ITEMS.'game='.TradeEnum::GAME . '&full_list=1');
 
         return $resp;
     }
 
-    public function create_deposit(\Illuminate\Http\Request $request)
-    {
-        $o             = new Order();
-        $o->user_id    = 1;
-        $o->status     = OrderEnum::CREATED;
-        $o->usd_amount = 0;
-        $o->rub_amount = 0;
-        $o->items      = json_encode($request->items);
-
-        //        $data = urlencode(
-        //            json_encode([
-        //                'deposit_id' => 1,
-        //                'game'       => TradeEnum::GAME,
-        //                'items'      => $request->get('items'),
-        //            ])
-        //        );
-        //
-        //        $resp = Http::withHeaders([
-        //            'Token'        => TradeEnum::TOKEN,
-        //            'Content-Type' => 'application/x-www-form-urlencoded'
-        //            //                'application/json',
-        //        ])->withBody(
-        //            urlencode(
-        //                json_encode([
-        //                    'deposit_id' => 1,
-        //                    'game'       => TradeEnum::GAME,
-        //                    'items'      => $request->get('items'),
-        //                ])
-        //            )
-        //        )
-        //            ->post(TradeEnum::TRADE);
-
-        //        dd("transaction_id=". "123"
-        //            ."&game="
-        //            .TradeEnum::GAME."&items=" . "783312163");
-
-
-        $o->save();
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL            => TradeEnum::DEPOSIT,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING       => "",
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => 30,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST  => "POST",
-            CURLOPT_POSTFIELDS     => "deposit_id=".$o->id
-                ."&steam_id=76561198841334052",
-            CURLOPT_HTTPHEADER     => [
-                "Token:".TradeEnum::TOKEN,
-                "cache-control: no-cache",
-                "content-type: application/x-www-form-urlencoded",
-            ],
-        ]);
-        //        .
-        //        "&game=".TradeEnum::GAME."&items=".implode(', ', $request->get('items')
-        $resp = curl_exec($curl);
-        $resp = json_decode($resp);
-        $o->save();
-
-        if ($resp->status == 'error') {
-            $o->status = OrderEnum::ERROR;
-            $o->save();
-
-            return response()->json([
-                'status' => false,
-                'err'    => $resp->error_message,
-            ]);
-        }
-
-        $o->url            = $resp->url;
-        $o->status         = OrderEnum::PROCESSING;
-        $o->transaction_id = intval($resp->transaction_id);
-        $o->save();
-
-        return response()->json([
-            'status' => true,
-            'data'   => $resp,
-        ]);
-
-        //                dd($resp);
-
-        //        $resp = ;
-        //        12430999
-
-
-        //        dd($request->all());
-    }
-
     public function create_trade(\Illuminate\Http\Request $request)
     {
-        $order = Order::find($request->get('order_id'));
-
-        if (empty($order)) {
-            return response()->json(
-                ['status' => false, 'err' => ErrEnum::ORDER_NOT_FOUND],
-                400
-            );
+        if (empty($request->get('items_ids'))){
+            return response()->json(['status' => false, 'error' => 'items is empty'], 400);
         }
+        $items = Items::whereIn('id', $request->get('items_ids'))->get();
+        $user  = auth()->id() ?? User::find(1);
 
 
+        if ($items->count() > 1) {
+            foreach ($items as $item){
+                $order = $this->createOrder($user, $item);
+                $this->sendTrade($user, $order, $item->shop_item_id);
+            }
+
+            return response()->json(['status' => true, 'data' => 'order process']);
+        } else {
+            $item = $items->first();
+            $order = $this->createOrder($user, $item);
+            $resp = $this->sendTrade($user, $order, $item->shop_item_id);
+            logger('$resp', [$resp]);
+
+            return response()->json(['status' => true, 'data' => $resp]);
+        }
+    }
+
+    public function createOrder(User $user, $item): Order
+    {
+        logger('$item', [$item->name, $item->id, $item->price_usd]);
+        $o             = new Order();
+        $o->user_id    = $user->id;
+        $o->status     = OrderEnum::PROCESSING;
+        $o->usd_amount = $item->price_usd;
+        $o->rub_amount = $item->price_rub;
+        $o->items      = json_encode(['id' => $item->id, 'name' => $item->name]);
+        $o->save();
+
+        return $o;
+    }
+
+    public function sendTrade($user, $order, $shop_item_id)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL            => TradeEnum::TRADE,
@@ -355,29 +298,71 @@ class TradeController extends Controller
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
-            //            $resp->transaction_id
-            CURLOPT_POSTFIELDS     => "transaction_id=".$order->transaction_id
-                ."&game=".TradeEnum::GAME."&items=".implode(
-                    ', ',
-                    $request->get('items')
-                ),
+
+            CURLOPT_POSTFIELDS     => json_encode([
+                'partner' =>  $user->partner,
+                'token' => $user->token,
+                'id' => $shop_item_id, // здесь передаем ID предмета в их системе
+                'custom_id' => $order->id, // ID order в нашей систмеме
+            ]),
+
+            CURLOPT_HTTPHEADER     => [
+                "Token:".TradeEnum::TOKEN,
+                "cache-control: no-cache",
+                "content-type: application/json",
+            ],
+        ]);
+
+        $response = json_decode(curl_exec($curl));
+        logger('$resp', [$response]);
+
+        if ($response->status == 'error') {
+            $order->status = OrderEnum::ERROR;
+            $order->save();
+            return response()->json(['status' => false, 'error' => $response->error_message]);
+        }
+        $order->status = OrderEnum::PROCESSING;
+        $order->transaction_id = $response->purchase_id;
+        $order->save();
+        logger('$order', [$order]);
+
+        return $response;
+//        return response()->json(['status' => true, 'data' => $o]);
+    }
+
+    public function trade_status(\Illuminate\Http\Request $request)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL            => TradeEnum::TRADE_INFO . 'purchase_ids=' . $request->get('purchase_ids'),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => "",
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => "GET",
             CURLOPT_HTTPHEADER     => [
                 "Token:".TradeEnum::TOKEN,
                 "cache-control: no-cache",
                 "content-type: application/x-www-form-urlencoded",
             ],
         ]);
-        $response = curl_exec($curl);
-        $err      = curl_error($curl);
-        dd($response);
-        //        dd(json_encode([
-        //            'deposit_id' => 1,
-        //            'game'       => TradeEnum::GAME,
-        //            'items'      => $request->get('items'),
-        //        ]));
+        $response = json_decode(curl_exec($curl));
+        return response()->json(['status' => true, 'data' => $response]);
 
-        //        dd($resp->json());
-        return $resp->json();
+        //        TRADE_INFO
+    }
+
+    public function save_trade_url(\Illuminate\Http\Request $request)
+    {
+        $user = auth()->user() ?? User::find(1);
+        $user->trade_url = $request->get('trade_url');
+        $partner_raw = explode('partner=', $user->trade_url)[1];
+        $user->partner = substr($partner_raw, 0, strpos($partner_raw, '&'));
+        $user->token = explode('token=', $user->trade_url)[1];
+        $user->save();
+
+        return redirect('/market');
     }
 
 }

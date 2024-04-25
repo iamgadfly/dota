@@ -16,5 +16,8 @@ class Order extends Model
         'usd_amount',
         'rub_amount',
         'items',
+        'transaction_id',
+        'balance_debited_amount',
+        'date',
     ];
 }
